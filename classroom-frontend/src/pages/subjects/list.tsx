@@ -38,7 +38,7 @@ const SubjectsList = () => {
                 size: 200,
                 header: () => <p className={"column-title"}>Name</p>,
                 cell: ({ getValue }) => <span className={"text-foreground"}>{getValue<string>()}</span>,
-                filterFn: 'includesString' /* enables text based filtering on this column */
+                filterFn: 'includesString', /* enables text based filtering on this column */
             },
             {
                 id: 'department',
@@ -80,10 +80,11 @@ const SubjectsList = () => {
 
                 <div className="actions-row">
                     <div className="search-field">
-                        <Search className="search-icon" />
+                        <Search className="search-icon" aria-hidden="true" />
 
                         <Input
                             type={"text"}
+                            aria-label={"Search subjects by name"}
                             placeholder={"Search by name..."}
                             className={"pl-10 w-full"}
                             value={searchQuery}
