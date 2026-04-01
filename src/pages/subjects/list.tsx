@@ -16,6 +16,62 @@ const SubjectsList = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedDepartment, setSelectedDepartment] = useState("all");
 
+    const subjectColumns = useMemo<ColumnDef<Subject>[]>(
+        () => [
+            {
+                id: "code",
+                accessorKey: "code",
+                size: 100,
+                header: () => <p className="column-title ml-2">Code</p>,
+                cell: ({ getValue }) => <Badge>{getValue<string>()}</Badge>,
+            },
+            {
+                id: "name",
+                accessorKey: "name",
+                size: 200,
+                header: () => <p className="column-title">Name</p>,
+                cell: ({ getValue }) => (
+                    <span className="text-foreground">{getValue<string>()}</span>
+                ),
+                filterFn: "includesString",
+            },
+            {
+                id: "department",
+                accessorKey: "department.name",
+                size: 150,
+                header: () => <p className="column-title">Department</p>,
+                cell: ({ getValue }) => (
+                    <Badge variant="secondary">{getValue<string>()}</Badge>
+                ),
+            },
+            {
+                id: "description",
+                accessorKey: "description",
+                size: 300,
+                header: () => <p className="column-title">Description</p>,
+                cell: ({ getValue }) => (
+                    <span className="truncate line-clamp-2">{getValue<string>()}</span>
+                ),
+            },
+            // {
+            //     id: "details",
+            //     size: 140,
+            //     header: () => <p className="column-title">Details</p>,
+            //     cell: ({ row }) => (
+            //         <ShowButton
+            //             resource="subjects"
+            //             recordItemId={row.original.id}
+            //             variant="outline"
+            //             size="sm"
+            //         >
+            //             View
+            //         </ShowButton>
+            //     ),
+            // },
+        ],
+        []
+    );
+
     const departmentFilters = selectedDepartment === 'all' ? [] : [
         { field: "department", operator: "eq" as const, value: selectedDepartment },
     ]
@@ -24,40 +80,10 @@ const SubjectsList = () => {
     ] : [];
 
     const subjectTable = useTable<Subject>({
-        columns: useMemo<ColumnDef<Subject>[]>(() => [
-            {
-                id: 'code',
-                accessorKey: 'code',
-                size: 100,
-                header: () => <p className={"column-title ml-2"}>Code</p>,
-                cell: ({ getValue }) => <Badge>{getValue<string>()}</Badge>
-            },
-            {
-                id: 'name',
-                accessorKey: 'name',
-                size: 200,
-                header: () => <p className={"column-title"}>Name</p>,
-                cell: ({ getValue }) => <span className={"text-foreground"}>{getValue<string>()}</span>,
-                filterFn: 'includesString', /* enables text based filtering on this column */
-            },
-            {
-                id: 'department',
-                accessorKey: 'department',
-                size: 150,
-                header: () => <p className={"column-title"}>Department</p>,
-                cell: ({ getValue }) => <Badge variant={"secondary"}>{getValue<string>()}</Badge>,
-            },
-            {
-                id: 'description',
-                accessorKey: 'description',
-                size: 300,
-                header: () => <p className={"column-title"}>Description</p>,
-                cell: ({getValue}) => <span className={"truncateline-clamp-2"}>{getValue<string>()}</span>,
-            }
-        ], []),
+        columns: subjectColumns,
         refineCoreProps: {
             resource: 'subjects',
-            pagination: { pageSize: 1, mode: 'server'},
+            pagination: { pageSize: 10, mode: 'server'},
             filters: {
                 permanent: [...departmentFilters, ...searchFilters]
             },
