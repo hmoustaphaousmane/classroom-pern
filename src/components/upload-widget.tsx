@@ -35,7 +35,7 @@ const UploadWidget = ({ value = null, onChange, disabled = false}) => {
                 clientAllowedFormats: ['png', 'jpg', 'jpeg', 'webp'],
             }, (error, result) => {
                 if(!error && result && result.event === 'success') {
-                    const payload: UploadPayload = {
+                    const payload: UploadWidgetValue = {
                         url: result.info.secure_url,
                         publicId: result.info.public_id,
                     }
@@ -72,6 +72,18 @@ const UploadWidget = ({ value = null, onChange, disabled = false}) => {
             {preview ? (
                 <div className="upload-preview">
                     <img src={preview.url} alt="Uploaded file" />
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setPreview(null);
+                            setDeleteToken(null);
+                            onChangeRef.current?.(null);
+                        }}
+                        aria-label="Remove image"
+                        disabled={disabled}
+                    >
+                        Remove
+                    </button>
                 </div>
             ) : <div
                 className="upload-dropzone"

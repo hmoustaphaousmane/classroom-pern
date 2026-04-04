@@ -5,7 +5,7 @@ import {useBack} from "@refinedev/core";
 import {Separator} from "@/components/ui/separator.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm } from "@refinedev/react-hook-form"
 import {classSchema} from "@/lib/schema.ts";
 import * as z from "zod";
 
@@ -23,8 +23,7 @@ import {Label} from "@/components/ui/label.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {Loader2} from "lucide-react";
-import UploadWidget from "@/components/upload-widget";
-
+import UploadWidget, {UploadWidgetValue} from "@/components/upload-widget";
 
 const Create = () => {
     const back = useBack();
@@ -41,6 +40,7 @@ const Create = () => {
     });
 
     const {
+        refineCore: {onFinish},
         handleSubmit,
         formState: { isSubmitting, errors },
         control,
@@ -49,8 +49,10 @@ const Create = () => {
     const onSubmit = async (values: z.infer<typeof classSchema>) => {
         try {
             console.log(values);
+            await onFinish(values);
         } catch (error) {
             console.error("Error creating class:", error);
+            // throw error;
         }
     };
 
@@ -80,13 +82,13 @@ const Create = () => {
 
     const bannerPublicId = form.watch('bannerCldPubId');
 
-    const setBannerImage = (file, field) => {
+    const setBannerImage = (file: UploadWidgetValue | null, field: { onChange: (value: string) => void }) => {
         if(file) {
-            form.setValue('bannerCldPubId', file.publicId, {
-                shouldValidate: true,
-                shouldDirty: true,
-            });
-            field.onChange(file.url);
+        form.setValue('bannerCldPubId', file.publicId, {
+            shouldValidate: true,
+            shouldDirty: true,
+        });
+        field.onChange(file.url);
         } else {
             field.onChange('');
             form.setValue('bannerCldPubId', '', {
@@ -131,12 +133,16 @@ const Create = () => {
                                             </FormLabel>
                                             <FormControl>
                                                 <UploadWidget
-                                                    value={field.value ? {
-                                                        url: filed.value,
-                                                        publicId: bannerPublicId ?? ''
-                                                    } : null}
-                                                    onChange={(file, field) => setBannerImage(file, field)}
-                                                    onRemove={field.onChange}
+                                                    value={
+                                                    field.value
+                                                        ? {
+                                                            url: field.value,
+                                                            publicId: bannerPublicId ?? ''
+                                                        }
+                                                        : null}
+                                                    // onChange={(file, field) => setBannerImage(file, field)}
+                                                    // onRemove={field.onChange}
+                                                    onChange={(file) => setBannerImage(file, field)}
                                                 />
                                             </FormControl>
                                             <FormMessage />
